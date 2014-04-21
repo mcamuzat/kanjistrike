@@ -76,7 +76,7 @@ class Missile:
         return self.primary_frame.get_rect().width
     def setContent(self, text):
         self.primary_frame.blit(IMAGE_MISSILE, (0, 0))
-        utils.drawVerticalText(self.primary_frame, text, 
+        utils.drawVerticalText(self.primary_frame, text,
                                int(IMAGE_MISSILE.get_rect().width / 2), 20)
     def reset(self):
         rects = [self.getFullRect()]
@@ -108,7 +108,7 @@ class Missile:
             return 0
     def getShortenedRect(self):
         r = self.primary_frame.get_rect()
-        r.height -= self.getVerticalOffset()
+        r.height = max(0, r.height - self.getVerticalOffset())
         r.top = self.getVerticalOffset()
         return r
     def getClippedRect(self):
@@ -419,19 +419,19 @@ class GameEndScreen:
         # only init if there are no texts.
         self.texts = []
         self.current_top = 100
-        self.texts.append(utils.PauseText("Play time:", GAME_END_LEFT1, 
+        self.texts.append(utils.PauseText("Play time:", GAME_END_LEFT1,
                                           self.current_top, GAME_END_DELAY))
-        self.texts.append(utils.PauseText(playtime, GAME_END_LEFT2, 
+        self.texts.append(utils.PauseText(playtime, GAME_END_LEFT2,
                                           self.current_top, GAME_END_DELAY))
         self.current_top += self.texts[0].get_height()
-        self.texts.append(utils.PauseText("Correct:", GAME_END_LEFT1, 
+        self.texts.append(utils.PauseText("Correct:", GAME_END_LEFT1,
                                           self.current_top, GAME_END_DELAY))
-        self.texts.append(utils.PauseText("%s%%" % correct_perc, GAME_END_LEFT2, 
+        self.texts.append(utils.PauseText("%s%%" % correct_perc, GAME_END_LEFT2,
                                           self.current_top, GAME_END_DELAY))
         self.current_top += self.texts[2].get_height()
-        self.texts.append(utils.PauseText("Mastered:", GAME_END_LEFT1, 
+        self.texts.append(utils.PauseText("Mastered:", GAME_END_LEFT1,
                                           self.current_top, GAME_END_DELAY))
-        self.texts.append(utils.PauseText("%s" % mastered, GAME_END_LEFT2, 
+        self.texts.append(utils.PauseText("%s" % mastered, GAME_END_LEFT2,
                                           self.current_top, GAME_END_DELAY))
         self.current_top += self.texts[4].get_height()
         self.button_ok.setTopCenter(self.current_top + 20,
@@ -471,8 +471,8 @@ class GameEndScreen:
         refresh = self.refresh_counter.up()
         if refresh:
             self.refresh_counter.reset()
-            rects.append(utils.drawHorizontalText(surf, 
-                                                  "GAME OVER", 
+            rects.append(utils.drawHorizontalText(surf,
+                                                  "GAME OVER",
                                                   GAME_END_LEFT1 + 20,
                                                   GAME_SCREEN_MIN_Y + 20))
             if self.allUp():
@@ -554,8 +554,8 @@ class GameLoop():
                   - (frame * STATUS_BAR_WIDTH),
                   MISSILE_BAR_CORNER[1])
         return [r]
-    def drawMissileBar(self, surf, game_state, 
-                       full_fraction, missile_reset_pause, 
+    def drawMissileBar(self, surf, game_state,
+                       full_fraction, missile_reset_pause,
                        correct_text, force_redraw):
         rects = []
         if full_fraction < 1:
@@ -894,10 +894,10 @@ class GameLoop():
         surf.fill((0, 0, 0), meteor_container_rect)
         redraw_rects.extend(self.drawLifeBar(surf))
         redraw_rects.extend(self.drawMissileBar(surf,
-                                                game_state, 
-                                                self.shot_history.pauseFraction(), 
+                                                game_state,
+                                                self.shot_history.pauseFraction(),
                                                 0,
-                                                self.correct_text, 
+                                                self.correct_text,
                                                 True))
         redraw_rects.append(surf.get_rect())
         pygame.display.update(redraw_rects)
@@ -905,10 +905,10 @@ class GameLoop():
         redraw_rects = []
         redraw_rects.extend(self.drawLifeBar(surf))
         redraw_rects.extend(self.drawMissileBar(surf,
-                                                game_state, 
-                                                self.shot_history.pauseFraction(), 
+                                                game_state,
+                                                self.shot_history.pauseFraction(),
                                                 self.missile_reset_pause,
-                                                self.correct_text, 
+                                                self.correct_text,
                                                 True))
         return redraw_rects
     def run(self, surf):
@@ -933,7 +933,7 @@ class GameLoop():
             surf.fill((64, 64, 64))
             surf.fill((0, 0, 0), meteor_container_rect)
 
-            
+
             self.input_main.update()
             if self.input_main.quit:
                 loop_res = consts.LOOP_RES_QUIT
@@ -963,7 +963,7 @@ class GameLoop():
             elif game_state == GAMEPLAY_INIT_MISSILE_COLLISION:
                 res = self.stateInitMissileCollision()
             else:
-                keep_going = False                
+                keep_going = False
                 loop_res = consts.LOOP_RES_MENU
                 res = (GAMEPLAY_RETURN_TO_MENU, [])
             game_state = res[0]
@@ -980,12 +980,12 @@ class GameLoop():
             if redraw_counter.up():
                 redraw_rects.extend(self.drawSaveBox(surf, True))
                 redraw_rects.extend(self.redrawBars(surf, game_state))
-                redraw_rects.append(utils.surfBlit(surf, IMAGE_GUIDE, 
+                redraw_rects.append(utils.surfBlit(surf, IMAGE_GUIDE,
                                                    MISSILE_BAR_CORNER[0], 50))
                 redraw_counter.reset()
 
-            redraw_rects.extend(self.drawMissileBar(surf, game_state, 
-                                                    self.shot_history.pauseFraction(), 
+            redraw_rects.extend(self.drawMissileBar(surf, game_state,
+                                                    self.shot_history.pauseFraction(),
                                                     self.missile_reset_pause,
                                                     self.correct_text,
                                                     False))
